@@ -117,7 +117,7 @@ with col1:
     )
 
     redundancia_movil = st.number_input(
-        "Mínimo x2 + x3",
+        "Mínimo canales 4G y 5G",
         value=15,
         step=1,
         format="%d"
@@ -140,7 +140,7 @@ with col2:
     )
 
 factor_balanceo = st.number_input(
-    "Factor de balanceo (x2 ≤ factor × x3)",
+    "Factor de balanceo (cantidad de 5G para cada 4G",
     value=2,
     step=1,
     format="%d",
