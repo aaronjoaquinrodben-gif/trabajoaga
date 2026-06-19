@@ -173,12 +173,7 @@ if st.button("🚀 Resolver Problema", use_container_width=True):
 
         st.table(resultados)
 
-        st.subheader("Vector Solución")
-
-        st.write([
-            int(round(valor))
-            for valor in res.x
-        ])
+       
 
     else:
         st.error(f"No se encontró solución: {res.message}")
