@@ -57,66 +57,11 @@ with col4:
 
 with col5:
     c5 = st.number_input(
-        "Fibra (x5)",
+        "Fibra Óptica (x5)",
         value=1000,
         step=1,
         format="%d"
     )
-
-# =========================
-# COSTOS
-# =========================
-
-st.header("Restricción de Presupuesto")
-
-col1, col2, col3, col4, col5 = st.columns(5)
-
-with col1:
-    a11 = st.number_input(
-        "Costo x1",
-        value=2,
-        step=1,
-        format="%d"
-    )
-
-with col2:
-    a12 = st.number_input(
-        "Costo x2",
-        value=5,
-        step=1,
-        format="%d"
-    )
-
-with col3:
-    a13 = st.number_input(
-        "Costo x3",
-        value=15,
-        step=1,
-        format="%d"
-    )
-
-with col4:
-    a14 = st.number_input(
-        "Costo x4",
-        value=30,
-        step=1,
-        format="%d"
-    )
-
-with col5:
-    a15 = st.number_input(
-        "Costo x5",
-        value=10,
-        step=1,
-        format="%d"
-    )
-
-presupuesto = st.number_input(
-    "Presupuesto máximo ($/h)",
-    value=1500,
-    step=1,
-    format="%d"
-)
 
 # =========================
 # CAPACIDAD DEL SWITCH
@@ -174,20 +119,21 @@ capacidad = st.number_input(
 )
 
 # =========================
-# BOTÓN RESOLVER
+# RESOLVER
 # =========================
 
 if st.button("🚀 Resolver Problema", use_container_width=True):
 
+    # Función objetivo (negativa porque milp minimiza)
     c = [-c1, -c2, -c3, -c4, -c5]
 
+    # Única restricción: capacidad del switch
     A = [
-        [a11, a12, a13, a14, a15],
         [a21, a22, a23, a24, a25]
     ]
 
-    bl = [-np.inf, -np.inf]
-    bu = [presupuesto, capacidad]
+    bl = [-np.inf]
+    bu = [capacidad]
 
     constraints = LinearConstraint(A, bl, bu)
 
@@ -196,7 +142,7 @@ if st.button("🚀 Resolver Problema", use_container_width=True):
         [np.inf, np.inf, np.inf, np.inf, np.inf]
     )
 
-    # Todas las variables son enteras
+    # Variables enteras
     integrality = [1, 1, 1, 1, 1]
 
     res = milp(
