@@ -2,53 +2,185 @@ import streamlit as st
 import numpy as np
 from scipy.optimize import milp, LinearConstraint, Bounds
 
-st.title("Optimizador de Rendimiento de Transmisión")
+st.set_page_config(
+    page_title="Optimizador de Rendimiento de Transmisión",
+    page_icon="📡",
+    layout="wide"
+)
 
-st.header("Función Objetivo")
+st.title("📡 Optimizador de Rendimiento de Transmisión")
 
-c1 = st.number_input("Coeficiente de x1 (Coaxial)", value=15.0)
-c2 = st.number_input("Coeficiente de x2 (4G)", value=20.0)
-c3 = st.number_input("Coeficiente de x3 (5G)", value=100.0)
-c4 = st.number_input("Coeficiente de x4 (Satélite)", value=50.0)
-c5 = st.number_input("Coeficiente de x5 (Fibra Óptica)", value=1000.0)
+st.markdown("""
+Modifica los parámetros del modelo y presiona **Resolver Problema**
+para encontrar la asignación óptima de canales.
+""")
+
+# =========================
+# FUNCIÓN OBJETIVO
+# =========================
+
+st.header("Función Objetivo (Mbps por canal)")
+
+col1, col2, col3, col4, col5 = st.columns(5)
+
+with col1:
+    c1 = st.number_input(
+        "Coaxial (x1)",
+        value=15,
+        step=1,
+        format="%d"
+    )
+
+with col2:
+    c2 = st.number_input(
+        "4G (x2)",
+        value=20,
+        step=1,
+        format="%d"
+    )
+
+with col3:
+    c3 = st.number_input(
+        "5G (x3)",
+        value=100,
+        step=1,
+        format="%d"
+    )
+
+with col4:
+    c4 = st.number_input(
+        "Satélite (x4)",
+        value=50,
+        step=1,
+        format="%d"
+    )
+
+with col5:
+    c5 = st.number_input(
+        "Fibra (x5)",
+        value=1000,
+        step=1,
+        format="%d"
+    )
+
+# =========================
+# COSTOS
+# =========================
 
 st.header("Restricción de Presupuesto")
 
-a11 = st.number_input("Costo x1", value=2.0)
-a12 = st.number_input("Costo x2", value=5.0)
-a13 = st.number_input("Costo x3", value=15.0)
-a14 = st.number_input("Costo x4", value=30.0)
-a15 = st.number_input("Costo x5", value=10.0)
+col1, col2, col3, col4, col5 = st.columns(5)
+
+with col1:
+    a11 = st.number_input(
+        "Costo x1",
+        value=2,
+        step=1,
+        format="%d"
+    )
+
+with col2:
+    a12 = st.number_input(
+        "Costo x2",
+        value=5,
+        step=1,
+        format="%d"
+    )
+
+with col3:
+    a13 = st.number_input(
+        "Costo x3",
+        value=15,
+        step=1,
+        format="%d"
+    )
+
+with col4:
+    a14 = st.number_input(
+        "Costo x4",
+        value=30,
+        step=1,
+        format="%d"
+    )
+
+with col5:
+    a15 = st.number_input(
+        "Costo x5",
+        value=10,
+        step=1,
+        format="%d"
+    )
 
 presupuesto = st.number_input(
     "Presupuesto máximo ($/h)",
-    value=1500.0
+    value=1500,
+    step=1,
+    format="%d"
 )
+
+# =========================
+# CAPACIDAD DEL SWITCH
+# =========================
 
 st.header("Restricción de Capacidad del Switch")
 
-a21 = st.number_input("Capacidad x1", value=20.0)
-a22 = st.number_input("Capacidad x2", value=25.0)
-a23 = st.number_input("Capacidad x3", value=110.0)
-a24 = st.number_input("Capacidad x4", value=60.0)
-a25 = st.number_input("Capacidad x5", value=1050.0)
+col1, col2, col3, col4, col5 = st.columns(5)
+
+with col1:
+    a21 = st.number_input(
+        "Capacidad x1",
+        value=20,
+        step=1,
+        format="%d"
+    )
+
+with col2:
+    a22 = st.number_input(
+        "Capacidad x2",
+        value=25,
+        step=1,
+        format="%d"
+    )
+
+with col3:
+    a23 = st.number_input(
+        "Capacidad x3",
+        value=110,
+        step=1,
+        format="%d"
+    )
+
+with col4:
+    a24 = st.number_input(
+        "Capacidad x4",
+        value=60,
+        step=1,
+        format="%d"
+    )
+
+with col5:
+    a25 = st.number_input(
+        "Capacidad x5",
+        value=1050,
+        step=1,
+        format="%d"
+    )
 
 capacidad = st.number_input(
-    "Capacidad máxima del switch (Mbps)",
-    value=15000.0
+    "Capacidad máxima del Switch (Mbps)",
+    value=15000,
+    step=1,
+    format="%d"
 )
 
-variables_enteras = st.checkbox(
-    "Forzar variables enteras",
-    value=False
-)
+# =========================
+# BOTÓN RESOLVER
+# =========================
 
-if st.button("Resolver problema"):
+if st.button("🚀 Resolver Problema", use_container_width=True):
 
-    # Función objetivo (negativa porque milp minimiza)
     c = [-c1, -c2, -c3, -c4, -c5]
 
-    # Matriz de restricciones
     A = [
         [a11, a12, a13, a14, a15],
         [a21, a22, a23, a24, a25]
@@ -64,7 +196,8 @@ if st.button("Resolver problema"):
         [np.inf, np.inf, np.inf, np.inf, np.inf]
     )
 
-    integrality = [1, 1, 1, 1, 1] if variables_enteras else [0, 0, 0, 0, 0]
+    # Todas las variables son enteras
+    integrality = [1, 1, 1, 1, 1]
 
     res = milp(
         c=c,
@@ -75,23 +208,31 @@ if st.button("Resolver problema"):
 
     if res.success:
 
-        st.success("Optimización completada")
+        st.success("Optimización completada correctamente")
 
         st.metric(
-            "Rendimiento máximo",
-            f"{-res.fun:.2f} Mbps"
+            label="Rendimiento Máximo",
+            value=f"{int(round(-res.fun))} Mbps"
         )
 
-        st.subheader("Solución óptima")
+        st.subheader("Asignación Óptima de Canales")
 
-        st.write(f"Coaxial (x1): {res.x[0]:.2f}")
-        st.write(f"4G (x2): {res.x[1]:.2f}")
-        st.write(f"5G (x3): {res.x[2]:.2f}")
-        st.write(f"Satélite (x4): {res.x[3]:.2f}")
-        st.write(f"Fibra Óptica (x5): {res.x[4]:.2f}")
+        resultados = {
+            "Cable Coaxial (x1)": int(round(res.x[0])),
+            "4G (x2)": int(round(res.x[1])),
+            "5G (x3)": int(round(res.x[2])),
+            "Satélite (x4)": int(round(res.x[3])),
+            "Fibra Óptica (x5)": int(round(res.x[4]))
+        }
 
-        st.subheader("Vector solución")
-        st.write(res.x)
+        st.table(resultados)
+
+        st.subheader("Vector Solución")
+
+        st.write([
+            int(round(valor))
+            for valor in res.x
+        ])
 
     else:
         st.error(f"No se encontró solución: {res.message}")
