@@ -140,7 +140,7 @@ with col2:
     )
 
 factor_balanceo = st.number_input(
-    "Factor de balanceo (cantidad de 5G para cada 4G",
+    "Factor de balanceo (mínimo de 5G para cada 4G)",
     value=2,
     step=1,
     format="%d",
